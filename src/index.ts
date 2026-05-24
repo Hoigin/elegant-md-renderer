@@ -546,6 +546,37 @@ function countBlockCloses(line: string): number {
   return count;
 }
 
+// ── Template Wrapping ─────────────────────────────────────────────────
+
+/**
+ * Wrap a RenderResult in an HTML template file.
+ * Replaces placeholders: {{TITLE}}, {{CONTENT}}, {{MATHJAX_CSS}}, {{MERMAID_SCRIPT}}
+ */
+export function wrapInTemplate(result: RenderResult, templatePath: string): string {
+  const template = fs.readFileSync(templatePath, 'utf-8');
+
+  // Build Mermaid conditional script
+  const mermaidScript = result.hasMermaid ? `
+  if (document.querySelector('.mermaid')) {
+    document.querySelectorAll('.mermaid').forEach(el => {
+      el.setAttribute('data-original', el.innerHTML);
+    });
+    const s = document.createElement('script');
+    s.src = 'https://cdn.jsdelivr.net/npm/mermaid@11/dist/mermaid.min.js';
+    s.onload = () => {
+      mermaid.initialize({ startOnLoad: false, theme: 'default' });
+      mermaid.run();
+    };
+    document.head.appendChild(s);
+  }` : '';
+
+  return template
+    .replace('{{TITLE}}', result.title)
+    .replace('{{MATHJAX_CSS}}', result.mathjaxCss)
+    .replace('{{MERMAID_SCRIPT}}', mermaidScript)
+    .replace('{{CONTENT}}', result.bodyHtml);
+}
+
 // ── Exports for later tasks ────────────────────────────────────────────
 
 export { DEFAULT_ALERT_ICONS, ALERT_RE, isSpacedEmptyLine };
