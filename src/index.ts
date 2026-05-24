@@ -457,14 +457,93 @@ export function render(content: string, options?: RenderOptions): RenderResult {
   };
 }
 
-// ── Placeholder Functions (to be replaced in later tasks) ─────────────
+// ── HTML Formatting ───────────────────────────────────────────────────
+
+// Block-level open tags (need own line, increase indent)
+const BLOCK_OPEN_RE = /^<(div|p|h[1-6]|ul|ol|li|table|thead|tbody|tr|th|td|blockquote|section|article|header|footer|nav|main|aside|figure|figcaption|details|summary|dl|dt|dd|hr|br)[\s>]/i;
+// Block-level close tags (need own line, decrease indent)
+const BLOCK_CLOSE_RE = /^<\/(div|p|h[1-6]|ul|ol|li|table|thead|tbody|tr|th|td|blockquote|section|article|header|footer|nav|main|aside|figure|figcaption|details|summary|dl|dt|dd)>/i;
 
 /**
  * Formats HTML with proper indentation.
- * Placeholder - will be implemented in Task 5.
+ * Removes excessive blank lines outside <pre>, adds indentation at block boundaries.
+ * <pre> content whitespace is preserved.
  */
 function formatHtml(html: string): string {
-  return html;
+  // Remove consecutive blank lines (only outside <pre>, inside is code semantics)
+  // First protect <pre> content with placeholders, compress, then restore
+  const preBlocks: string[] = [];
+  html = html.replace(/<pre[\s>][^]*?<\/pre>/gi, (match) => {
+    preBlocks.push(match);
+    return `\x00PRE${preBlocks.length - 1}\x00`;
+  });
+  html = html.replace(/\n{2,}/g, '\n');
+  html = html.replace(/\x00PRE(\d+)\x00/g, (_, idx) => preBlocks[Number(idx)]);
+
+  // Insert newlines at block-level tag boundaries: close tag followed by open/close tag
+  // e.g., </div><p> -> </div>\n<p>, </div></li> -> </div>\n</li>
+  const blockTagNames = 'div|p|h[1-6]|ul|ol|li|table|thead|tbody|tr|th|td|blockquote|section|article|header|footer|nav|main|aside|figure|figcaption|details|summary|dl|dt|dd';
+  html = html.replace(
+    new RegExp(`(<\\/(${blockTagNames})>)(<\\/?(?:${blockTagNames}|hr|br)[\\s>])`, 'gi'),
+    '$1\n$3'
+  );
+
+  // Process lines: content is inside <body>, initial depth is 1 (4-space indent)
+  const result: string[] = [];
+  let inPre = false;
+  let depth = 1;
+  let preIndentDepth = 0; // <pre> content line indent level, for HTML source readability
+
+  for (const line of html.split('\n')) {
+    // Inside <pre>: preserve original whitespace (code semantic indent cannot be trimmed)
+    // Add preIndentDepth level indent for HTML source readability, JS will strip at page load
+    if (inPre) {
+      result.push('    '.repeat(preIndentDepth) + line);
+      if (line.includes('</pre')) {
+        inPre = false;
+      }
+      continue;
+    }
+
+    const trimmed = line.trim();
+    if (trimmed === '') continue;
+
+    // Calculate indent: close-only lines use depth-1, open lines use depth, mixed lines use depth
+    const isCloseOnly = BLOCK_CLOSE_RE.test(trimmed) && !BLOCK_OPEN_RE.test(trimmed);
+    const indent = isCloseOnly ? depth - 1 : depth;
+    result.push('    '.repeat(Math.max(0, indent)) + trimmed);
+
+    // Detect if this line enters <pre>
+    if (trimmed.includes('<pre')) {
+      inPre = true;
+      // <pre> content is one level deeper than <pre> tag, data-indent records depth for JS stripping
+      preIndentDepth = indent + 1;
+      result[result.length - 1] = result[result.length - 1].replace(
+        /<pre(\s[^>]*)?>/,
+        (_match, attrs) => attrs ? `<pre${attrs} data-indent="${preIndentDepth}">` : `<pre data-indent="${preIndentDepth}">`
+      );
+    }
+
+    // Update depth
+    depth += countBlockOpens(trimmed) - countBlockCloses(trimmed);
+    if (depth < 0) depth = 0;
+  }
+
+  return result.join('\n');
+}
+
+function countBlockOpens(line: string): number {
+  let count = 0;
+  const re = /<(div|p|h[1-6]|ul|ol|li|table|thead|tbody|tr|th|td|blockquote|section|article|header|footer|nav|main|aside|figure|figcaption|details|summary|dl|dt|dd)[\s>]/gi;
+  while (re.exec(line) !== null) count++;
+  return count;
+}
+
+function countBlockCloses(line: string): number {
+  let count = 0;
+  const re = /<\/(div|p|h[1-6]|ul|ol|li|table|thead|tbody|tr|th|td|blockquote|section|article|header|footer|nav|main|aside|figure|figcaption|details|summary|dl|dt|dd)>/gi;
+  while (re.exec(line) !== null) count++;
+  return count;
 }
 
 // ── Exports for later tasks ────────────────────────────────────────────
