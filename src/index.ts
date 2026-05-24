@@ -94,6 +94,20 @@ function isSpacedEmptyLine(srcLines: string[], lineIdx: number): boolean {
   return after.trim() === '' && after.length > 0;
 }
 
+/**
+ * Default slugify function for heading IDs.
+ * Converts text to lowercase, preserves CJK characters, replaces spaces with hyphens.
+ */
+function defaultSlugify(text: string): string {
+  let slug = text.replace(/<[^>]+>/g, ''); // Remove HTML tags
+  slug = slug.toLowerCase();
+  slug = slug.replace(/[^\w一-鿿㐀-䶿\-\s]/g, ''); // Keep letters, digits, CJK, hyphens, spaces
+  slug = slug.replace(/\s+/g, '-'); // Spaces → hyphens
+  slug = slug.replace(/-+/g, '-'); // Merge consecutive hyphens
+  slug = slug.replace(/^-|-$/g, ''); // Remove leading/trailing hyphens
+  return slug;
+}
+
 // ── Main Render Function ───────────────────────────────────────────────
 
 /**
@@ -126,6 +140,238 @@ export function render(content: string, options?: RenderOptions): RenderResult {
   if (opts.emoji) md.use(emoji);
   if (opts.footnote) md.use(footnote);
   if (opts.alerts) md.use(alerts);
+
+  // ── Replace github-alerts core rule for nesting support ──────────────
+  // 1. Nesting counter correctly matches blockquote_open/close pairs
+  // 2. Hide paragraph when [!TYPE] is the only content
+  // 3. Fill empty inline tokens in alerts with space to prevent collapse
+  // 4. Scan source for spaced empty lines lost by markdown-it and insert <p>&nbsp;</p>
+
+  if (opts.alerts) {
+    md.core.ruler.at('github-alerts', (state) => {
+      const tokens = state.tokens;
+      const srcLines = state.src.split('\n');
+
+      // Collect all alert ranges, process from inner to outer to avoid splice affecting outer indices
+      const ranges: { openIdx: number; closeIdx: number; firstContentIdx: number; match: RegExpMatchArray; level: number }[] = [];
+
+      for (let i = 0; i < tokens.length; i++) {
+        if (tokens[i].type !== 'blockquote_open') continue;
+        let nesting = 1;
+        let j = i + 1;
+        while (j < tokens.length && nesting > 0) {
+          if (tokens[j].type === 'blockquote_open') nesting++;
+          else if (tokens[j].type === 'blockquote_close') nesting--;
+          j++;
+        }
+        const fcIdx = tokens.findIndex((t, k) => k > i && k < j && t.type === 'inline');
+        if (fcIdx < 0) continue;
+        const match = tokens[fcIdx].content.match(ALERT_RE);
+        if (!match) continue;
+        ranges.push({ openIdx: i, closeIdx: j - 1, firstContentIdx: fcIdx, match, level: tokens[i].level });
+      }
+
+      ranges.sort((a, b) => b.closeIdx - a.closeIdx);
+
+      for (const { openIdx, closeIdx, firstContentIdx, match, level } of ranges) {
+        const type = match[1].toLowerCase();
+        const title = match[2].trim() || type.charAt(0).toUpperCase() + type.slice(1);
+        const icon = DEFAULT_ALERT_ICONS[type] ?? '';
+        const firstContent = tokens[firstContentIdx];
+
+        // Strip [!TYPE], hide paragraph if only title remains
+        firstContent.content = firstContent.content.slice(match[0].length).trimStart();
+        if (!firstContent.content) {
+          firstContent.children = [];
+          firstContent.hidden = true;
+          if (tokens[firstContentIdx - 1].type === 'paragraph_open') tokens[firstContentIdx - 1].hidden = true;
+          if (tokens[firstContentIdx + 1].type === 'paragraph_close') tokens[firstContentIdx + 1].hidden = true;
+        }
+
+        tokens[openIdx].type = 'alert_open';
+        tokens[openIdx].tag = 'div';
+        tokens[openIdx].meta = { title, type, icon };
+        tokens[closeIdx].type = 'alert_close';
+        tokens[closeIdx].tag = 'div';
+
+        // Fill empty inline tokens in alert with space (non-nested empty lines)
+        for (let k = openIdx + 1; k < closeIdx; k++) {
+          if (tokens[k].type !== 'inline' || tokens[k].content.trim() || tokens[k].hidden) continue;
+          tokens[k].content = ' ';
+          tokens[k].children = [];
+        }
+
+        // Scan source for spaced empty lines lost in nested blockquotes
+        const open = tokens[openIdx];
+        if (!open.map) continue;
+        const [startLine, endLine] = open.map;
+        const targetGtCount = level + 1;
+
+        const spacedSourceLines: number[] = [];
+        for (let lineIdx = startLine; lineIdx < endLine; lineIdx++) {
+          const line = srcLines[lineIdx];
+          if ((line.match(/>/g) || []).length !== targetGtCount) continue;
+          if (!isSpacedEmptyLine(srcLines, lineIdx)) continue;
+          spacedSourceLines.push(lineIdx);
+        }
+
+        // Calculate insert positions, then splice from high to low to avoid index offset
+        const insertPositions: number[] = [];
+        for (const spacedLine of spacedSourceLines) {
+          // Locate by map[0]: insert before first token after the spaced line
+          let insertPos = closeIdx;
+          for (let k = openIdx + 1; k < closeIdx; k++) {
+            const m = tokens[k].map;
+            if (m && m[0] > spacedLine) { insertPos = k; break; }
+          }
+          insertPositions.push(insertPos);
+        }
+
+        insertPositions.sort((a, b) => b - a);
+        for (const insertPos of insertPositions) {
+          const nbspace = new state.Token('inline', '', 0);
+          nbspace.content = ' ';
+          nbspace.children = [];
+          const pOpen = new state.Token('paragraph_open', 'p', 1);
+          const pClose = new state.Token('paragraph_close', 'p', -1);
+          tokens.splice(insertPos, 0, pOpen, nbspace, pClose);
+        }
+      }
+    });
+  }
+
+  // ── Handle spaced empty lines in regular blockquotes ───────────────────
+  // When a blockquote line has '>' followed by whitespace-only content,
+  // markdown-it may drop the content, causing empty blockquotes or invisible paragraphs.
+  // This rule fills or inserts nbsp at those positions to make them visible,
+  // matching the rendering logic for spaced empty lines in GitHub Alerts.
+
+  md.core.ruler.push('blockquote-spaced-lines', (state) => {
+    const tokens = state.tokens;
+    const srcLines = state.src.split('\n');
+
+    // Collect positions needing insertion, process from inner to outer
+    const inserts: { blockIdx: number; lineIdx: number; closeIdx: number; hasInline: boolean; inlineIdx: number }[] = [];
+
+    for (let i = 0; i < tokens.length; i++) {
+      if (tokens[i].type !== 'blockquote_open') continue;
+
+      let nesting = 1;
+      let j = i + 1;
+      while (j < tokens.length && nesting > 0) {
+        if (tokens[j].type === 'blockquote_open') nesting++;
+        else if (tokens[j].type === 'blockquote_close') nesting--;
+        j++;
+      }
+
+      const closeIdx = j - 1;
+      const open = tokens[i];
+      if (!open.map) continue;
+
+      const [startLine, endLine] = open.map;
+      const level = open.level;
+      const targetGtCount = level + 1;
+
+      for (let lineIdx = startLine; lineIdx < endLine; lineIdx++) {
+        const line = srcLines[lineIdx];
+        if ((line.match(/>/g) || []).length !== targetGtCount) continue;
+        if (!isSpacedEmptyLine(srcLines, lineIdx)) continue;
+
+        // Find corresponding empty inline token
+        let hasInline = false;
+        let inlineIdx = -1;
+        for (let k = i + 1; k < closeIdx; k++) {
+          if (tokens[k].type !== 'inline' || tokens[k].content.trim() || tokens[k].hidden) continue;
+          const prev = tokens[k - 1];
+          if (prev?.type === 'paragraph_open' && prev.map && prev.map[0] === lineIdx) {
+            hasInline = true;
+            inlineIdx = k;
+            break;
+          }
+        }
+
+        inserts.push({ blockIdx: i, lineIdx, closeIdx, hasInline, inlineIdx });
+      }
+    }
+
+    // Process from inner to outer (closeIdx descending) to avoid splice offset issues
+    inserts.sort((a, b) => b.closeIdx - a.closeIdx);
+
+    // First handle hasInline (direct token modification, no splice)
+    for (const { hasInline, inlineIdx } of inserts) {
+      if (!hasInline) continue;
+      const textToken = new state.Token('text', '', 0);
+      textToken.content = ' ';
+      tokens[inlineIdx].children = [textToken];
+      tokens[inlineIdx].content = ' ';
+    }
+
+    // Calculate splice positions, process from high to low
+    const spliceInserts: { blockIdx: number; lineIdx: number; insertPos: number }[] = [];
+    for (const { blockIdx, lineIdx, closeIdx, hasInline } of inserts) {
+      if (hasInline) continue;
+      let insertPos = closeIdx;
+      for (let k = blockIdx + 1; k < closeIdx; k++) {
+        const m = tokens[k].map;
+        if (m && m[0] > lineIdx) { insertPos = k; break; }
+      }
+      spliceInserts.push({ blockIdx, lineIdx, insertPos });
+    }
+    spliceInserts.sort((a, b) => b.insertPos - a.insertPos);
+
+    for (const { lineIdx, insertPos } of spliceInserts) {
+      const nbspace = new state.Token('inline', '', 0);
+      nbspace.content = ' ';
+      const textChild = new state.Token('text', '', 0);
+      textChild.content = ' ';
+      nbspace.children = [textChild];
+      const pOpen = new state.Token('paragraph_open', 'p', 1);
+      pOpen.map = [lineIdx, lineIdx + 1];
+      const pClose = new state.Token('paragraph_close', 'p', -1);
+      tokens.splice(insertPos, 0, pOpen, nbspace, pClose);
+    }
+  });
+
+  // ── Heading ID generation (matching anchor link href format) ───────────
+  // markdown-it doesn't add id to headings by default, causing anchor links to fail.
+  // This rule converts heading text to slug and sets as id attribute.
+  // Format: lowercase, spaces → hyphens, preserve CJK, remove punctuation.
+  // Duplicate headings get -1/-2 suffix, matching GitHub behavior.
+
+  const slugCounts: Record<string, number> = {};
+  const slugifyFn = opts.slugify || defaultSlugify;
+
+  md.renderer.rules.heading_open = (tokens, idx) => {
+    const token = tokens[idx];
+    const inlineToken = tokens[idx + 1];
+    const text = inlineToken?.type === 'inline' ? inlineToken.content : '';
+    const baseSlug = slugifyFn(text);
+    const count = slugCounts[baseSlug] || 0;
+    slugCounts[baseSlug] = count + 1;
+    const id = count > 0 ? `${baseSlug}-${count}` : baseSlug;
+    token.attrSet('id', id);
+    return `<${token.tag} id="${id}">`;
+  };
+
+  // ── Custom table cell renderer (convert align to style) ────────────────
+  // markdown-it outputs deprecated align="center" attribute,
+  // convert to style="text-align:..." for proper browser rendering
+
+  md.renderer.rules.td = (tokens, idx, options, env, self) => {
+    const token = tokens[idx];
+    const alignAttr = token.attrs?.find(a => a[0] === 'align');
+    const style = alignAttr ? ` style="text-align:${alignAttr[1]}"` : '';
+    const content = token.children ? self.renderInline(token.children, options, env) : '';
+    return `<td${style}>${content}</td>`;
+  };
+
+  md.renderer.rules.th = (tokens, idx, options, env, self) => {
+    const token = tokens[idx];
+    const alignAttr = token.attrs?.find(a => a[0] === 'align');
+    const style = alignAttr ? ` style="text-align:${alignAttr[1]}"` : '';
+    const content = token.children ? self.renderInline(token.children, options, env) : '';
+    return `<th${style}>${content}</th>`;
+  };
 
   // Custom fence renderer for mermaid and code blocks
   md.renderer.rules.fence = (tokens, idx) => {
