@@ -1,0 +1,54 @@
+{
+  "name": "elegant-md-renderer",
+  "version": "0.1.0",
+  "description": "Typora-compatible Markdown->HTML renderer with nested alerts, code line numbers, MathJax, Mermaid, and more",
+  "type": "module",
+  "main": "./dist/index.js",
+  "types": "./dist/index.d.ts",
+  "exports": {
+    ".": {
+      "import": "./dist/index.js",
+      "types": "./dist/index.d.ts"
+    }
+  },
+  "files": [
+    "dist"
+  ],
+  "scripts": {
+    "build": "tsc",
+    "test": "vitest run",
+    "prepublishOnly": "npm run build"
+  },
+  "keywords": [
+    "markdown",
+    "markdown-it",
+    "typora",
+    "mathjax",
+    "mermaid",
+    "highlight.js",
+    "renderer"
+  ],
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/Hoigin/elegant-md-renderer"
+  },
+  "dependencies": {
+    "highlight.js": "^11.11.1",
+    "markdown-it": "^14.2.0",
+    "markdown-it-emoji": "^3.0.0",
+    "markdown-it-footnote": "^4.0.0",
+    "markdown-it-github-alerts": "^1.0.1",
+    "markdown-it-mark": "^4.0.0",
+    "markdown-it-mathjax3-pro": "^1.0.0",
+    "markdown-it-task-lists": "^2.1.1"
+  },
+  "devDependencies": {
+    "@types/markdown-it": "^14.1.2",
+    "@types/markdown-it-emoji": "^3.0.1",
+    "@types/markdown-it-footnote": "^3.0.4",
+    "@types/node": "^25.9.1",
+    "typescript": "^6.0.3",
+    "vitest": "^4.1.7"
+  }
+}
