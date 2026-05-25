@@ -17,6 +17,7 @@
   "scripts": {
     "build": "tsc",
     "test": "vitest run",
+    "demo:build": "tsx demo/build.ts",
     "prepublishOnly": "npm run build"
   },
   "keywords": [
