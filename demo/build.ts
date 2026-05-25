@@ -3,7 +3,7 @@ import path from 'path';
 import { render } from '../src/index.js';
 
 const DEMO_DIR = path.resolve(import.meta.dirname);
-const FIXTURE_PATH = path.join(DEMO_DIR, 'fixtures', 'Markdown 渲染器测试报告.md');
+const FIXTURE_PATH = path.join(DEMO_DIR, 'fixtures', 'elegant-md-renderer demo.md');
 const TEMPLATE_PATH = path.join(DEMO_DIR, 'template.html');
 const OUTPUT_DIR = path.join(DEMO_DIR, 'dist');
 const OUTPUT_PATH = path.join(OUTPUT_DIR, 'index.html');
