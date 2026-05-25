@@ -1,3 +1,9 @@
+/* ── Global Font Size ──────────────────────────────────── */
+
+html {
+    font-size: 18px;
+}
+
 /* ── Showcase Header ──────────────────────────────────── */
 
 .showcase-header {
@@ -54,22 +60,39 @@
 .container {
     display: grid;
     grid-template-columns: 1fr 1fr;
-    height: calc(100vh - 3rem);
-    overflow: hidden;
+    height: calc(100vh - 4rem);
+    overflow-y: auto;
+}
+
+.source-panel, .render-panel {
+    display: flex;
+    flex-direction: column;
+    min-width: 0;
 }
 
 .panel-title {
-    flex: 1;
+    position: sticky;
+    top: 0;
     padding: 0.5rem 1rem;
     font-size: 1.5rem;
     text-align: center;
     font-weight: 600;
     text-transform: uppercase;
     letter-spacing: 0.5px;
+    color: var(--page-text);
+    border-bottom: 2px solid var(--border-color);
+    background: var(--page-bg);
+    flex-shrink: 0;
+    z-index: 1;
+}
+
+.panel-scroll {
+    flex: 1;
+    min-width: 0;
+    overflow-x: hidden;
 }
 
 .source-panel {
-    overflow-y: auto;
     background: var(--page-bg);
     border-right: 2px solid var(--topbar-border);
 }
@@ -93,13 +116,6 @@
 }
 
 .render-panel {
-    overflow-y: auto;
-    background: var(--page-bg);
-}
-
-.panel-title {
-    color: var(--page-text);
-    border-bottom: 2px solid var(--border-color);
     background: var(--page-bg);
 }
 
@@ -108,19 +124,30 @@
     max-width: 100%;
 }
 
-/* ── Responsive ──────────────────────────────────────── */
+/* ── Responsive: 窄屏上下两栏，同步滚动 ──────────── */
 
-@media (max-width: 768px) {
+@media (max-width: 600px) {
+    html {
+        font-size: 12px;
+    }
     .container {
         grid-template-columns: 1fr;
-        height: auto;
+        grid-template-rows: 1fr 1fr;
+        height: calc(100vh - 4rem);
+        overflow-y: hidden;
+    }
+    .source-panel, .render-panel {
+        min-height: 0;
+        overflow: hidden;
     }
     .source-panel {
         border-right: none;
         border-bottom: 1px solid var(--topbar-border);
-        max-height: 50vh;
     }
-    .render-panel {
-        overflow-y: visible;
+    .panel-title {
+        position: static;
+    }
+    .panel-scroll {
+        overflow-y: auto;
     }
 }

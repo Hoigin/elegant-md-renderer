@@ -33,11 +33,11 @@
     <div class="container">
         <div class="source-panel">
             <div class="panel-title">源文件</div>
-            <pre><code>{{SOURCE}}</code></pre>
+            <div class="panel-scroll"><pre><code>{{SOURCE}}</code></pre></div>
         </div>
         <div class="render-panel">
             <div class="panel-title">渲染效果</div>
-            <article class="post-body">{{CONTENT}}</article>
+            <div class="panel-scroll"><article class="post-body">{{CONTENT}}</article></div>
         </div>
     </div>
 
@@ -89,24 +89,36 @@
         }
     });
 
-    // ── 同步滚动 ──────────────────────────────────
-    const sourcePanel = document.querySelector('.source-panel');
-    const renderPanel = document.querySelector('.render-panel');
-    let syncing = false;
-    sourcePanel.addEventListener('scroll', () => {
-        if (syncing) return;
-        syncing = true;
-        const ratio = sourcePanel.scrollTop / (sourcePanel.scrollHeight - sourcePanel.clientHeight || 1);
-        renderPanel.scrollTop = ratio * (renderPanel.scrollHeight - renderPanel.clientHeight);
-        requestAnimationFrame(() => syncing = false);
-    });
-    renderPanel.addEventListener('scroll', () => {
-        if (syncing) return;
-        syncing = true;
-        const ratio = renderPanel.scrollTop / (renderPanel.scrollHeight - renderPanel.clientHeight || 1);
-        sourcePanel.scrollTop = ratio * (sourcePanel.scrollHeight - sourcePanel.clientHeight);
-        requestAnimationFrame(() => syncing = false);
-    });
+    // ── 同步滚动（窄屏上下两栏时启用） ──────────────
+    function setupSyncScroll() {
+        const sourceScroll = document.querySelector('.source-panel .panel-scroll');
+        const renderScroll = document.querySelector('.render-panel .panel-scroll');
+        let leader = null;
+        let resetTimer;
+        function scheduleReset() {
+            clearTimeout(resetTimer);
+            resetTimer = setTimeout(() => leader = null, 100);
+        }
+        sourceScroll.addEventListener('scroll', () => {
+            if (leader === 'render') return;
+            leader = 'source';
+            scheduleReset();
+            const ratio = sourceScroll.scrollTop / (sourceScroll.scrollHeight - sourceScroll.clientHeight || 1);
+            renderScroll.scrollTop = ratio * (renderScroll.scrollHeight - renderScroll.clientHeight);
+        });
+        renderScroll.addEventListener('scroll', () => {
+            if (leader === 'source') return;
+            leader = 'render';
+            scheduleReset();
+            const ratio = renderScroll.scrollTop / (renderScroll.scrollHeight - renderScroll.clientHeight || 1);
+            sourceScroll.scrollTop = ratio * (sourceScroll.scrollHeight - sourceScroll.clientHeight);
+        });
+    }
+
+    // 窄屏（≤600px）时启用同步滚动，宽屏时由容器统一滚动无需同步
+    const mql = window.matchMedia('(max-width: 600px)');
+    if (mql.matches) setupSyncScroll();
+    mql.addEventListener('change', () => { if (mql.matches) setupSyncScroll(); });
 
     // ── 剥离 <pre> 内容中的 HTML 源码缩进 ──────────
     document.querySelectorAll('pre[data-indent]').forEach(pre => {

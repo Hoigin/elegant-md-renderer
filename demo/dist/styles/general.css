@@ -37,6 +37,7 @@ body {
 @media (min-width: 601px) {
     .post-body {
         max-width: 1200px;
+        margin: 0 auto;
     }
 }
 
@@ -108,7 +109,7 @@ mjx-container[display="true"] {
     overflow-y: hidden;
 }
 
-/* ── 行内代码 ─────────────────────────────────────────── */
+/* ── 行内代码 ────────────────────────────────────────── */
 
 .post-body code:not(.hljs) {
     background-color: var(--inline-code-bg);

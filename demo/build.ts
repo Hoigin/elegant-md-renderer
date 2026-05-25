@@ -25,7 +25,7 @@ function escapeHtml(text: string): string {
     .replace(/'/g, '&#39;');
 }
 
-// Build Mermaid conditional script (same logic as blog's md2html_renderer)
+// Build Mermaid conditional script
 const mermaidScript = result.hasMermaid ? `
 <script>
   document.querySelectorAll('.mermaid').forEach(el => {
