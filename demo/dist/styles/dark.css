@@ -1,0 +1,62 @@
+:root {
+    --page-bg: #1e1e1e;
+    --page-text: #d4d4d4;
+    --card-bg: #232323;
+    --card-border: #31302e;
+    --card-shadow: rgba(0, 0, 0, 0.3);
+    --title-color: #d4d4d4;
+    --link-color: #58a6ff;
+    --title-link-hover: #e74c3c;
+    --icon-link-hover: #d4d4d4;
+    --border-color: #31302e;
+    --quote-color: #808080;
+    --quote-border-color: #31302e;
+    --avatar-border: #31302e;
+    --toggle-color: #808080;
+
+    /* 顶栏 */
+    --topbar-bg: #1e1e1e;
+    --topbar-border: #31302e;
+
+    /* 目录侧栏 */
+    --toc-bg: #232323;
+    --toc-border: #31302e;
+    --toc-heading-color: #d4d4d4;
+    --toc-link-color: #a0a0a0;
+    --toc-active-color: #d4d4d4;
+    --toc-hover-bg: rgba(90, 78, 58, 0.2);
+
+    /* 代码块 */
+    --post-code-bg: #232323;
+    --post-code-border: #363636;
+    --post-code-lang-bg: #2a2a2a;
+    --post-code-lang-color: #8a8a8a;
+    --post-code-line-color: #666666;
+    --post-code-line-border: #363636;
+
+    /* 行内代码 */
+    --inline-code-bg: #2a2a2a;
+    --inline-code-border: #363636;
+
+    /* 表格 */
+    --table-border-color: #595959;
+    --table-header-bg: #333333;
+
+    /* 目录遮挡层 */
+    --toc-overlay-bg: rgba(0, 0, 0, 0.7);
+
+    /* 提示容器 */
+    --alert-note-border: #79c0ff;    /* --alert-note-bg: #0d2137; */
+    --alert-tip-border: #3fb950;     /* --alert-tip-bg: #0f2714; */
+    --alert-important-border: #d2a8ff; /* --alert-important-bg: #1e0d36; */
+    --alert-warning-border: #d29922;  /* --alert-warning-bg: #2a1c04; */
+    --alert-caution-border: #f85149;  /* --alert-caution-bg: #30171a; */
+
+    /* 任务列表 */
+    --task-checkbox-accent: #58a6ff;
+}
+
+/* Mermaid 图表（仅覆盖 SVG 背景色，内部样式由 Mermaid 主题自带处理） */
+.mermaid svg {
+    background: #1e1e1e;
+}

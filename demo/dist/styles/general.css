@@ -1,0 +1,323 @@
+/* ── Base ─────────────────────────────────────────────── */
+
+html {
+    font-size: 14px;
+}
+
+@media (min-width: 601px) {
+    html {
+        font-size: 18px;
+    }
+}
+
+*, *::before, *::after { box-sizing: border-box; }
+
+body {
+    margin: 0;
+    font-family: "Open Sans", "PingFang SC", "Microsoft YaHei", sans-serif;
+    background: var(--page-bg);
+    color: var(--page-text);
+    line-height: 1.6;
+}
+
+/* ── 文章通用样式（与主题无关） ─────────────────────── */
+
+.post-body {
+    padding: 2rem 2rem 4rem;
+    overflow-wrap: break-word;
+    word-break: break-word;
+}
+
+@media (max-width: 600px) {
+    .post-body {
+        padding: 1.5rem 1rem 3rem;
+    }
+}
+
+@media (min-width: 601px) {
+    .post-body {
+        max-width: 1200px;
+    }
+}
+
+/* ── 代码块容器 ─────────────────────────────────────── */
+
+.post-code-block {
+    background: var(--post-code-bg);
+    border: 2px solid var(--post-code-border);
+    border-radius: 0.25rem;
+    margin: 1em 0;
+}
+
+/* ── 语言标签 ────────────────────────────────────────── */
+
+.post-code-lang {
+    display: block;
+    padding: 0.25rem 0.75rem;
+    font-size: 0.8rem;
+    color: var(--post-code-lang-color);
+    background: var(--post-code-lang-bg);
+    border-bottom: 1px solid var(--post-code-border);
+    text-transform: uppercase;
+    letter-spacing: 0.03125rem;
+    font-family: 'SFMono-Regular', Consolas, 'Liberation Mono', Menlo, monospace;
+}
+
+/* ── 双列布局：行号 + 代码 ───────────────────────────── */
+
+.post-code-content {
+    display: grid;
+    overflow-x: auto;
+}
+
+.post-code-line-numbers {
+    box-sizing: border-box;
+    overflow: hidden;
+    text-align: right;
+    padding: 0.25rem 0.5rem 0.25rem 0.5rem;
+    border-right: 1px solid var(--post-code-line-border);
+    color: var(--post-code-line-color);
+    user-select: none;
+    line-height: 1.6;
+    font-family: 'SFMono-Regular', Consolas, 'Liberation Mono', Menlo, monospace;
+    font-size: 1rem;
+    margin: 0;
+}
+
+.post-code-content pre {
+    margin: 0;
+    padding: 0.25rem 0.5rem 0.25rem 0.5rem;
+    min-width: 0;
+    overflow-x: auto;
+}
+
+.post-code-content pre code.hljs {
+    background: transparent;
+    padding: 0;
+    display: inline;
+    overflow-x: visible;
+    font-family: 'SFMono-Regular', Consolas, 'Liberation Mono', Menlo, monospace;
+    font-size: 0.9rem;
+    line-height: 1.6;
+}
+
+/* ── 数学公式 ────────────────────────────────────────── */
+
+mjx-container[display="true"] {
+    overflow-x: auto;
+    overflow-y: hidden;
+}
+
+/* ── 行内代码 ─────────────────────────────────────────── */
+
+.post-body code:not(.hljs) {
+    background-color: var(--inline-code-bg);
+    border: 1px solid var(--inline-code-border);
+    border-radius: 0.1875rem;
+    padding: 0 0.125rem 0 0.125rem;
+    font-size: 0.9rem;
+    font-family: 'SFMono-Regular', Consolas, 'Liberation Mono', Menlo, monospace;
+    overflow-wrap: break-word;
+    word-break: break-word;
+}
+
+/* ── 图片自适应 ──────────────────────────────────────── */
+
+img {
+    max-width: 100%;
+    height: auto;
+    display: block;
+    margin: 0 auto;
+}
+
+/* ── 引用块 ──────────────────────────────────────────── */
+
+.post-body blockquote {
+    margin: 0.8em 0;
+    padding: 0 0.9375rem;
+    border-left: 0.25rem solid var(--quote-border-color);
+    color: var(--quote-color);
+}
+
+.post-body blockquote blockquote {
+    margin: 0.5em 0;
+    padding-right: 0;
+}
+
+/* ── 提示容器（GitHub Alerts） ──────────────────────── */
+
+.markdown-alert {
+    padding: 0 1em;
+    margin: 1rem 1rem;
+    color: inherit;
+    border-left: 0.25rem solid var(--alert-border);
+}
+
+.markdown-alert-title {
+    font-weight: 700;
+    font-size: 0.9rem;
+    display: flex;
+    align-items: center;
+    gap: 0.15rem;
+    color: var(--alert-border);
+    margin: 0;
+}
+
+.markdown-alert-title svg {
+    fill: currentColor;
+    flex-shrink: 0;
+    position: relative;
+    top: 0.125em;
+    margin-right: 1ch;
+    overflow: visible;
+}
+
+.markdown-alert-note       { --alert-border: var(--alert-note-border); }
+.markdown-alert-tip        { --alert-border: var(--alert-tip-border); }
+.markdown-alert-important  { --alert-border: var(--alert-important-border); }
+.markdown-alert-warning    { --alert-border: var(--alert-warning-border); }
+.markdown-alert-caution    { --alert-border: var(--alert-caution-border); }
+
+.markdown-alert .markdown-alert {
+    margin: 0.5em 0;
+}
+
+.markdown-alert p {
+    margin: 0;
+}
+
+/* ── Mermaid 图表 ─────────────────────────────────────── */
+
+.mermaid {
+    text-align: center;
+    overflow-x: auto;
+    margin: 1em 0;
+}
+
+/* ── 超链接 ──────────────────────────────────────────── */
+
+.post-body a {
+    color: var(--link-color);
+    text-decoration: none;
+}
+
+.post-body a:hover {
+    text-decoration: underline;
+}
+
+/* ── 表格 ────────────────────────────────────────────── */
+
+.post-body table {
+    padding: 0;
+    word-break: initial;
+    border-collapse: collapse;
+    margin: 0.8em 0;
+    width: 100%;
+}
+
+.post-body table tr {
+    border: 2px solid var(--table-border-color);
+    margin: 0;
+    padding: 0;
+}
+
+.post-body table tr:nth-child(2n),
+.post-body thead {
+    background-color: var(--table-header-bg);
+}
+
+.post-body table th {
+    font-weight: bold;
+    border: 2px solid var(--table-border-color);
+    border-bottom-width: 0.125rem;
+    margin: 0;
+    padding: 0.375rem 0.8125rem;
+}
+
+.post-body table td {
+    border: 2px solid var(--table-border-color);
+    margin: 0;
+    padding: 0.375rem 0.8125rem;
+}
+
+.post-body table th:first-child,
+.post-body table td:first-child {
+    margin-top: 0;
+}
+
+.post-body table th:last-child,
+.post-body table td:last-child {
+    margin-bottom: 0;
+}
+
+/* ── 列表 ────────────────────────────────────────────── */
+
+.post-body ul,
+.post-body ol {
+    padding-left: 1.6rem;
+    margin: 0.8rem 0;
+}
+
+.post-body li {
+    margin: 0.4rem 0;
+}
+
+.post-body li > p {
+    margin: 0;
+}
+
+.post-body li > ol,
+.post-body li > ul {
+    margin: 0 0;
+}
+
+/* ── 任务列表 ────────────────────────────────────────── */
+
+.post-body .task-list-item {
+    list-style: none;
+}
+
+.post-body .task-list-item-checkbox {
+    margin-left: -1.3rem;
+    width: 1rem;
+    height: 1rem;
+    accent-color: var(--task-checkbox-accent);
+    vertical-align: middle;
+    pointer-events: none;
+    cursor: default;
+}
+
+/* ── 标题 ────────────────────────────────────────────── */
+
+.post-body h1,
+.post-body h2,
+.post-body h3,
+.post-body h4,
+.post-body h5,
+.post-body h6 {
+    position: relative;
+    margin-top: 1rem;
+    margin-bottom: 1rem;
+    font-weight: bold;
+    line-height: 1.4;
+    cursor: text;
+}
+
+.post-body h1 { font-size: 2.25rem; line-height: 1.2; }
+.post-body h2 { font-size: 2rem; line-height: 1.225; }
+.post-body h3 { font-size: 1.75rem; line-height: 1.43; }
+.post-body h4 { font-size: 1.5rem; }
+.post-body h5 { font-size: 1.25rem; }
+.post-body h6 { font-size: 1.1rem; }
+
+/* ── 分割线 ──────────────────────────────────────────── */
+
+.post-body hr {
+    height: 0.125rem;
+    padding: 0;
+    margin: 1rem 0;
+    background-color: var(--border-color);
+    border: 0 none;
+    overflow: hidden;
+    box-sizing: content-box;
+}

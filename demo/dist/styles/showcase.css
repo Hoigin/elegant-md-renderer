@@ -1,0 +1,126 @@
+/* ── Showcase Header ──────────────────────────────────── */
+
+.showcase-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    height: 4rem;
+    padding: 0 1rem;
+    background: var(--topbar-bg);
+    border-bottom: 2px solid var(--topbar-border);
+}
+
+.showcase-header h1 {
+    flex: 1;
+    font-size: 2rem;
+    text-align: center;
+    font-weight: 600;
+    color: var(--title-color);
+    margin: 0;
+}
+
+#theme-toggle {
+    flex-shrink: 0;
+    background: transparent;
+    border: none;
+    padding: 0;
+    width: 1.7rem;
+    height: 1.7rem;
+    cursor: pointer;
+    color: var(--toggle-color);
+    transition: color 0.2s ease;
+    border-radius: 50%;
+    outline: none;
+    -webkit-tap-highlight-color: transparent;
+    -webkit-appearance: none;
+    appearance: none;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+#theme-toggle svg {
+    fill: currentColor;
+    width: 1.7rem;
+    height: 1.7rem;
+}
+
+#theme-toggle:hover {
+    color: var(--icon-link-hover);
+}
+
+/* ── Split Layout ─────────────────────────────────────── */
+
+.container {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    height: calc(100vh - 3rem);
+    overflow: hidden;
+}
+
+.panel-title {
+    flex: 1;
+    padding: 0.5rem 1rem;
+    font-size: 1.5rem;
+    text-align: center;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+}
+
+.source-panel {
+    overflow-y: auto;
+    background: var(--page-bg);
+    border-right: 2px solid var(--topbar-border);
+}
+
+.source-panel pre {
+    margin: 0;
+    padding: 1rem;
+    font-family: "Open Sans", "PingFang SC", "Microsoft YaHei", sans-serif;
+    font-size: 0.85rem;
+    line-height: 1.5;
+    white-space: pre-wrap;
+    word-break: break-word;
+    tab-size: 4;
+}
+
+.source-panel code {
+    font-family: inherit;
+    font-size: inherit;
+    color: inherit;
+    background: none;
+}
+
+.render-panel {
+    overflow-y: auto;
+    background: var(--page-bg);
+}
+
+.panel-title {
+    color: var(--page-text);
+    border-bottom: 2px solid var(--border-color);
+    background: var(--page-bg);
+}
+
+.render-panel article.post-body {
+    padding: 1.5rem 2rem 4rem;
+    max-width: 100%;
+}
+
+/* ── Responsive ──────────────────────────────────────── */
+
+@media (max-width: 768px) {
+    .container {
+        grid-template-columns: 1fr;
+        height: auto;
+    }
+    .source-panel {
+        border-right: none;
+        border-bottom: 1px solid var(--topbar-border);
+        max-height: 50vh;
+    }
+    .render-panel {
+        overflow-y: visible;
+    }
+}

@@ -197,7 +197,7 @@ export function render(content: string, options?: RenderOptions): RenderResult {
         // Fill empty inline tokens in alert with space (non-nested empty lines)
         for (let k = openIdx + 1; k < closeIdx; k++) {
           if (tokens[k].type !== 'inline' || tokens[k].content.trim() || tokens[k].hidden) continue;
-          tokens[k].content = ' ';
+          tokens[k].content = ' ';
           tokens[k].children = [];
         }
 
@@ -230,7 +230,7 @@ export function render(content: string, options?: RenderOptions): RenderResult {
         insertPositions.sort((a, b) => b - a);
         for (const insertPos of insertPositions) {
           const nbspace = new state.Token('inline', '', 0);
-          nbspace.content = ' ';
+          nbspace.content = ' ';
           nbspace.children = [];
           const pOpen = new state.Token('paragraph_open', 'p', 1);
           const pClose = new state.Token('paragraph_close', 'p', -1);
@@ -301,9 +301,9 @@ export function render(content: string, options?: RenderOptions): RenderResult {
     for (const { hasInline, inlineIdx } of inserts) {
       if (!hasInline) continue;
       const textToken = new state.Token('text', '', 0);
-      textToken.content = ' ';
+      textToken.content = ' ';
       tokens[inlineIdx].children = [textToken];
-      tokens[inlineIdx].content = ' ';
+      tokens[inlineIdx].content = ' ';
     }
 
     // Calculate splice positions, process from high to low
@@ -321,9 +321,9 @@ export function render(content: string, options?: RenderOptions): RenderResult {
 
     for (const { lineIdx, insertPos } of spliceInserts) {
       const nbspace = new state.Token('inline', '', 0);
-      nbspace.content = ' ';
+      nbspace.content = ' ';
       const textChild = new state.Token('text', '', 0);
-      textChild.content = ' ';
+      textChild.content = ' ';
       nbspace.children = [textChild];
       const pOpen = new state.Token('paragraph_open', 'p', 1);
       pOpen.map = [lineIdx, lineIdx + 1];
