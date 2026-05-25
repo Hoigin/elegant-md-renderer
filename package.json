@@ -49,6 +49,7 @@
     "@types/markdown-it-emoji": "^3.0.1",
     "@types/markdown-it-footnote": "^3.0.4",
     "@types/node": "^25.9.1",
+    "tsx": "^4.22.3",
     "typescript": "^6.0.3",
     "vitest": "^4.1.7"
   }
