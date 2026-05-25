@@ -1,5 +1,5 @@
 import { describe, it, expect } from 'vitest';
-import { render, wrapInTemplate } from '../src/index.js';
+import { render, wrapInTemplate } from '../src/renderer.js';
 import path from 'path';
 
 const fixtureDir = path.join(import.meta.dirname, 'fixtures');

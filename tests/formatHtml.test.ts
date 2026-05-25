@@ -1,5 +1,5 @@
 import { describe, it, expect } from 'vitest';
-import { render } from '../src/index.js';
+import { render } from '../src/renderer.js';
 
 describe('formatHtml', () => {
   it('adds indentation to block-level tags', () => {

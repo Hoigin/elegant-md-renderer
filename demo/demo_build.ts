@@ -1,12 +1,12 @@
 import fs from 'fs';
 import path from 'path';
-import { render } from '../src/index.js';
+import { render } from '../src/renderer.js';
 
 const DEMO_DIR = path.resolve(import.meta.dirname);
 const FIXTURE_PATH = path.join(DEMO_DIR, 'fixtures', 'elegant-md-renderer demo.md');
-const TEMPLATE_PATH = path.join(DEMO_DIR, 'template.html');
+const TEMPLATE_PATH = path.join(DEMO_DIR, 'demo_template.html');
 const OUTPUT_DIR = path.join(DEMO_DIR, 'dist');
-const OUTPUT_PATH = path.join(OUTPUT_DIR, 'index.html');
+const OUTPUT_PATH = path.join(OUTPUT_DIR, 'demo.html');
 
 // Read inputs
 const mdSource = fs.readFileSync(FIXTURE_PATH, 'utf-8');

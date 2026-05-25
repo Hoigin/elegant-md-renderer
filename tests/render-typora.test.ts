@@ -1,5 +1,5 @@
 import { describe, it, expect } from 'vitest';
-import { render } from '../src/index.js';
+import { render } from '../src/renderer.js';
 
 describe('render — Typora compatibility', () => {
   it('wraps URLs with spaces in angle brackets', () => {

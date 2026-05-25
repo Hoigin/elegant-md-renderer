@@ -1,5 +1,5 @@
 import { describe, it, expect } from 'vitest';
-import { render, RenderResult, RenderOptions } from '../src/index.js';
+import { render, RenderResult, RenderOptions } from '../src/renderer.js';
 
 describe('render — basic', () => {
   it('renders simple markdown to HTML', () => {

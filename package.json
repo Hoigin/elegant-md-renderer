@@ -3,12 +3,12 @@
   "version": "0.1.0",
   "description": "Typora-compatible Markdown->HTML renderer with nested alerts, code line numbers, MathJax, Mermaid, and more",
   "type": "module",
-  "main": "./dist/index.js",
-  "types": "./dist/index.d.ts",
+  "main": "./dist/renderer.js",
+  "types": "./dist/renderer.d.ts",
   "exports": {
     ".": {
-      "import": "./dist/index.js",
-      "types": "./dist/index.d.ts"
+      "import": "./dist/renderer.js",
+      "types": "./dist/renderer.d.ts"
     }
   },
   "files": [
@@ -17,7 +17,7 @@
   "scripts": {
     "build": "tsc",
     "test": "vitest run",
-    "demo:build": "tsx demo/build.ts",
+    "demo:build": "tsx demo/demo_build.ts",
     "prepublishOnly": "npm run build"
   },
   "keywords": [
