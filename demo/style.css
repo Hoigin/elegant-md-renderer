@@ -1,0 +1,195 @@
+/* ── Reset & Base ────────────────────────────────────────── */
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+html { font-size: 16px; line-height: 1.6; }
+body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Helvetica, Arial, sans-serif; background: #f5f5f5; }
+
+/* ── Split Layout ────────────────────────────────────────── */
+.container {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 0;
+  height: 100vh;
+  overflow: hidden;
+}
+
+.panel-title {
+  padding: 8px 16px;
+  font-size: 14px;
+  font-weight: 600;
+  color: #666;
+  border-bottom: 2px solid #e0e0e0;
+  background: #fafafa;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.source-panel {
+  overflow: auto;
+  background: #1e1e2e;
+  border-right: 2px solid #e0e0e0;
+}
+
+.source-panel pre {
+  margin: 0;
+  padding: 16px;
+  font-family: "JetBrains Mono", "Fira Code", "Cascadia Code", Consolas, monospace;
+  font-size: 13px;
+  line-height: 1.5;
+  color: #cdd6f4;
+  white-space: pre;
+  tab-size: 4;
+}
+
+.source-panel code {
+  font-family: inherit;
+  font-size: inherit;
+  color: inherit;
+  background: none;
+}
+
+.render-panel {
+  overflow: auto;
+  background: #fff;
+  padding: 0;
+}
+
+.render-panel article {
+  padding: 24px 32px;
+  max-width: 100%;
+}
+
+/* ── Rendered Content Typography ─────────────────────────── */
+.render-panel article h1 { font-size: 2em; margin: 1em 0 0.5em; border-bottom: 1px solid #eee; padding-bottom: 0.3em; }
+.render-panel article h2 { font-size: 1.5em; margin: 1em 0 0.4em; border-bottom: 1px solid #eee; padding-bottom: 0.2em; }
+.render-panel article h3 { font-size: 1.25em; margin: 0.8em 0 0.3em; }
+.render-panel article h4 { font-size: 1.1em; margin: 0.6em 0 0.2em; }
+.render-panel article h5 { font-size: 1em; margin: 0.5em 0 0.2em; }
+.render-panel article h6 { font-size: 0.9em; margin: 0.5em 0 0.2em; color: #666; }
+
+.render-panel article p { margin: 0.8em 0; }
+.render-panel article a { color: #0969da; text-decoration: none; }
+.render-panel article a:hover { text-decoration: underline; }
+.render-panel article strong { font-weight: 700; }
+.render-panel article em { font-style: italic; }
+.render-panel article del { text-decoration: line-through; color: #999; }
+.render-panel article mark { background: #fff3bf; padding: 0.1em 0.2em; border-radius: 2px; }
+
+.render-panel article hr { border: none; height: 2px; background: #e0e0e0; margin: 1.5em 0; }
+
+.render-panel article ul, .render-panel article ol { padding-left: 2em; margin: 0.5em 0; }
+.render-panel article li { margin: 0.25em 0; }
+.render-panel article li ul, .render-panel article li ol { margin: 0.1em 0; }
+
+/* ── Task Lists ──────────────────────────────────────────── */
+.render-panel article .task-list-item { list-style: none; margin-left: -1.5em; }
+.render-panel article .task-list-item input[type="checkbox"] { margin-right: 0.5em; }
+
+/* ── Tables ──────────────────────────────────────────────── */
+.render-panel article table { border-collapse: collapse; width: 100%; margin: 1em 0; font-size: 0.95em; }
+.render-panel article th, .render-panel article td { border: 1px solid #d0d7de; padding: 6px 13px; }
+.render-panel article th { background: #f6f8fa; font-weight: 600; }
+.render-panel article td[style*="text-align:center"], .render-panel article th[style*="text-align:center"] { text-align: center; }
+.render-panel article td[style*="text-align:right"], .render-panel article th[style*="text-align:right"] { text-align: right; }
+
+/* ── Code Blocks ─────────────────────────────────────────── */
+.render-panel article .post-code-block {
+  margin: 1em 0;
+  border-radius: 6px;
+  overflow: hidden;
+}
+.render-panel article .post-code-lang {
+  display: inline-block;
+  padding: 2px 8px;
+  font-size: 12px;
+  color: #666;
+  background: #f6f8fa;
+  border-bottom: 1px solid #e0e0e0;
+}
+.render-panel article .post-code-content {
+  display: grid;
+  background: #f6f8fa;
+  overflow-x: auto;
+}
+.render-panel article .post-code-line-numbers {
+  padding: 12px 8px;
+  text-align: right;
+  color: #999;
+  font-family: "JetBrains Mono", "Fira Code", Consolas, monospace;
+  font-size: 13px;
+  line-height: 1.5;
+  user-select: none;
+  border-right: 1px solid #e0e0e0;
+}
+.render-panel article .post-code-content pre {
+  margin: 0;
+  padding: 12px 16px;
+  font-family: "JetBrains Mono", "Fira Code", Consolas, monospace;
+  font-size: 13px;
+  line-height: 1.5;
+  overflow-x: auto;
+}
+.render-panel article .hljs { background: transparent; }
+.render-panel article code {
+  font-family: "JetBrains Mono", "Fira Code", Consolas, monospace;
+  font-size: 0.9em;
+  background: #f0f0f0;
+  padding: 0.15em 0.4em;
+  border-radius: 4px;
+}
+
+/* ── Blockquotes ─────────────────────────────────────────── */
+.render-panel article blockquote {
+  margin: 1em 0;
+  padding: 0.5em 1em;
+  border-left: 4px solid #d0d7de;
+  color: #656d76;
+  background: #f6f8fa;
+}
+
+/* ── GitHub Alerts ───────────────────────────────────────── */
+.render-panel article .markdown-alert {
+  margin: 1em 0;
+  padding: 0.5em 1em;
+  border-left: 4px solid;
+  border-radius: 4px;
+}
+.render-panel article .markdown-alert--note { border-color: #0969da; background: #ddf4ff; }
+.render-panel article .markdown-alert--tip { border-color: #1a7f37; background: #dafbe1; }
+.render-panel article .markdown-alert--important { border-color: #8250df; background: #fbefff; }
+.render-panel article .markdown-alert--warning { border-color: #9a6700; background: #fff8c5; }
+.render-panel article .markdown-alert--caution { border-color: #cf222e; background: #ffebe9; }
+
+/* ── Footnotes ───────────────────────────────────────────── */
+.render-panel article .footnotes { font-size: 0.9em; color: #666; margin-top: 2em; border-top: 1px solid #eee; padding-top: 1em; }
+.render-panel article .footnote-ref { font-size: 0.8em; vertical-align: super; }
+
+/* ── Mermaid ─────────────────────────────────────────────── */
+.render-panel article .mermaid {
+  margin: 1em 0;
+  text-align: center;
+  background: #f6f8fa;
+  border-radius: 6px;
+  padding: 1em;
+}
+
+/* ── MathJax ─────────────────────────────────────────────── */
+.render-panel article mjx-container { overflow-x: auto; }
+
+/* ── Images ──────────────────────────────────────────────── */
+.render-panel article img { max-width: 100%; height: auto; border-radius: 6px; }
+
+/* ── Responsive ──────────────────────────────────────────── */
+@media (max-width: 768px) {
+  .container {
+    grid-template-columns: 1fr;
+    height: auto;
+  }
+  .source-panel {
+    border-right: none;
+    border-bottom: 2px solid #e0e0e0;
+    max-height: 50vh;
+  }
+  .render-panel {
+    overflow: visible;
+  }
+}
